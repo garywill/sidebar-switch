@@ -1,0 +1,3 @@
+/* Sidebar switcher's hover effect  */
+#sidebar_switcher { opacity: 0.2; }
+#sidebar_switcher:hover { opacity: 0.3; }
