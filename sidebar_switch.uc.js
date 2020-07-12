@@ -47,7 +47,7 @@ console.log("sidebar_switch.js");
             }catch(err){}
         }
         
-        /*
+        
         const nav_tb = document.getElementById("navigator-toolbox");
         var tabsbar_fullscr_observer = new MutationObserver(function(){
             if(nav_tb.getAttribute("inFullscreen")) // fullscreen
@@ -59,12 +59,12 @@ console.log("sidebar_switch.js");
             }
             else // not fullscreen
             {
-                switcher_c.style.display = "";  
+                switcher_c.style.display = "block";  
             }
             
         });
         tabsbar_fullscr_observer.observe(nav_tb,{attributes:true});
-        */
+        
         
     }
 })();
