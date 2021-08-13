@@ -1,7 +1,7 @@
 /* Firefox userChrome script
  * Add a slim switch on left of main content to toggle Firefox's native sidebar
- * Tested on Firefox 78
- * Author: garywill (https://github.com/garywill)
+ * Tested on Firefox 91
+ * Author: garywill (https://garywill.github.io)
  */
 
 console.log("sidebar_switch.js");
@@ -11,22 +11,11 @@ console.log("sidebar_switch.js");
     
     if ( bbrowser && document.getElementById("main-window") && document.getElementById("TabsToolbar") && document.getElementById("urlbar-container") )
     {
-        var switcher_c =  document.createElement("vbox");
+        var switcher_c =  document.createElement("vbox"); // TODO XULElement
         var switcher =  document.createElement("vbox");
         
         switcher.id = "sidebar_switcher";
         switcher_c.id = "sidebar_switcher_c";
- 
-        switcher_c.style.position = "relative";
-        switcher_c.style.display = "block";
-        switcher_c.style.zIndex = "9999999";
-        
-        switcher.style.width="6px";
-        switcher.style.minWidth="6px";
-        switcher.style.maxWidth="6px";
-        switcher.style.height="100%";
-        switcher.style.position = "absolute";
-        switcher.style.backgroundColor = "blue"; 
         
         switcher.tooltipText = "Click to toggle sidebar"
  
@@ -37,16 +26,38 @@ console.log("sidebar_switch.js");
             await SidebarUI.toggle();
         
         });
+
         
-        for (var i=0; i< document.styleSheets.length; i++ )
-        {
-            try{
-                document.styleSheets[i].insertRule(" #sidebar_switcher { opacity: 0.2; } ");
-                document.styleSheets[i].insertRule(" #sidebar_switcher:hover { opacity: 0.3; } ");
-                break;
-            }catch(err){}
-        }
+        Components.utils.import("resource:///modules/CustomizableUI.jsm");
+        const {Services} = Components.utils.import("resource://gre/modules/Services.jsm", {});
+        const sss = Components.classes["@mozilla.org/content/style-sheet-service;1"].getService(Components.interfaces.nsIStyleSheetService);
         
+        const css_ucjs = Services.io.newURI( "data:text/css;charset=utf-8," + encodeURIComponent(`
+            #sidebar_switcher_c
+            {
+                position: relative;
+                display: block;
+                z-index: 99999;
+            }
+            #sidebar_switcher 
+            { 
+                opacity: 0.2;
+                width: 6px;
+                min-width:6px;
+                max-width:6px;
+                height: 100%;
+                position: absolute;
+                background-color:blue;
+                
+            }
+            #sidebar_switcher:hover
+            { 
+                opacity: 0.3; 
+                
+            } 
+        `), null, null );
+        
+        sss.loadAndRegisterSheet(css_ucjs, sss.USER_SHEET);
         
         const nav_tb = document.getElementById("navigator-toolbox");
         var tabsbar_fullscr_observer = new MutationObserver(function(){
@@ -68,3 +79,4 @@ console.log("sidebar_switch.js");
         
     }
 })();
+
