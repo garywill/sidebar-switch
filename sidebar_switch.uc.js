@@ -4,6 +4,10 @@
  * Author: garywill (https://garywill.github.io)
  */
 
+// ==UserScript==
+// @include         main
+// ==/UserScript==
+
 console.log("sidebar_switch.js");
 
 (() => {
@@ -79,4 +83,3 @@ console.log("sidebar_switch.js");
         
     }
 })();
-
