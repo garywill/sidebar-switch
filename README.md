@@ -8,7 +8,7 @@ Replace the legacy addon All in One Sidebar. You can open sidebar by clicking ed
 
 This is a Firefox userChrome JS script.
 
-Tested on Firefox 91.
+Tested on Firefox 128.
 
 
 

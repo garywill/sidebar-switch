@@ -1,6 +1,6 @@
 /* Firefox userChrome script
  * Add a slim switch on left of main content to toggle Firefox's native sidebar
- * Tested on Firefox 91
+ * Tested on Firefox 128
  * Author: garywill (https://garywill.github.io)
  */
 
@@ -27,13 +27,13 @@ console.log("sidebar_switch.js");
         bbrowser.insertBefore(switcher_c, bbrowser.childNodes[0]);
         
         switcher.addEventListener('click', async function(){
-            await SidebarUI.toggle();
+            await SidebarController.toggle();
         
         });
 
         
         Components.utils.import("resource:///modules/CustomizableUI.jsm");
-        const {Services} = Components.utils.import("resource://gre/modules/Services.jsm", {});
+        const Services = globalThis.Services || ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
         const sss = Components.classes["@mozilla.org/content/style-sheet-service;1"].getService(Components.interfaces.nsIStyleSheetService);
         
         const css_ucjs = Services.io.newURI( "data:text/css;charset=utf-8," + encodeURIComponent(`
