@@ -1,6 +1,6 @@
 /* Firefox userChrome script
  * Add a slim switch on left of main content to toggle Firefox's native sidebar
- * Tested on Firefox 128
+ * Tested on Firefox 140
  * Author: garywill (https://garywill.github.io)
  */
 
@@ -11,11 +11,12 @@
 console.log("sidebar_switch.js");
 
 (() => {
+
     const bbrowser = document.getElementById("browser");
     
     if ( bbrowser && document.getElementById("main-window") && document.getElementById("TabsToolbar") && document.getElementById("urlbar-container") )
     {
-        var switcher_c =  document.createElement("vbox"); // TODO XULElement
+        var switcher_c =  document.createElement("vbox");
         var switcher =  document.createElement("vbox");
         
         switcher.id = "sidebar_switcher";
@@ -26,13 +27,34 @@ console.log("sidebar_switch.js");
         switcher_c.appendChild(switcher);
         bbrowser.insertBefore(switcher_c, bbrowser.childNodes[0]);
         
-        switcher.addEventListener('click', async function(){
-            await SidebarController.toggle();
-        
+        switcher.addEventListener('click', async function(event){
+            if (event.button === 0) {
+                await SidebarController.toggle('viewBookmarksSidebar');
+                if ( ! SidebarController.sidebarVerticalTabsEnabled ) {
+                    if ( ! SidebarController.isOpen)
+                        if (SidebarController.launcherVisible )
+                            await SidebarController.handleToolbarButtonClick()
+                }
+            }
+        });
+        // Right button clicked
+        switcher.addEventListener('contextmenu', async function(event) {
+            event.preventDefault();
+            if (event.button === 2) {
+                await SidebarController.handleToolbarButtonClick('viewBookmarksSidebar')
+            }
+        });
+
+        // Middle button clicked
+        switcher.addEventListener('auxclick', async function(event) {
+            event.preventDefault();
+            if (event.button === 1) {
+                SidebarController.toggleVerticalTabs()
+            }
         });
 
         
-        Components.utils.import("resource:///modules/CustomizableUI.jsm");
+        ChromeUtils.importESModule("resource:///modules/CustomizableUI.sys.mjs")
         const Services = globalThis.Services || ChromeUtils.import("resource://gre/modules/Services.jsm").Services;
         const sss = Components.classes["@mozilla.org/content/style-sheet-service;1"].getService(Components.interfaces.nsIStyleSheetService);
         
@@ -61,24 +83,38 @@ console.log("sidebar_switch.js");
             } 
         `), null, null );
         
-        sss.loadAndRegisterSheet(css_ucjs, sss.USER_SHEET);
+        if ( ! sss.sheetRegistered(css_ucjs, sss.USER_SHEET) )
+            sss.loadAndRegisterSheet(css_ucjs, sss.USER_SHEET);
         
-        const nav_tb = document.getElementById("navigator-toolbox");
-        var tabsbar_fullscr_observer = new MutationObserver(function(){
-            if(nav_tb.getAttribute("inFullscreen")) // fullscreen
+
+
+        const fullscr_toggler = document.getElementById("fullscr-toggler");
+        const fullscreen_warning = document.getElementById("fullscreen-warning");
+        var tabsbar_fullscr_observer = new MutationObserver(check_status_fullscreen);
+        function check_status_fullscreen(){
+            if (window.fullScreen)
             {
-                if(document.fullscreen) // video fullscreen
-                {   
-                    switcher_c.style.display = "none"; // hide
+                // console.log("fuldlscreen !!!");
+                if(document.fullscreenElement) // video fullscreen
+                {
+                    // console.log("fullscreen video");
+                    switcher_c.style.display = "none"; //hide
+                }
+                else // manually browser fullscreen
+                {
+                    // console.log("fullscreen non-video");
+                    switcher_c.style.display = ""; //show
                 }
             }
             else // not fullscreen
             {
-                switcher_c.style.display = "block";  
+                // console.log("not fullscreen");
+                switcher_c.style.display = ""; //show
             }
-            
-        });
-        tabsbar_fullscr_observer.observe(nav_tb,{attributes:true});
+        }
+
+        tabsbar_fullscr_observer.observe(fullscr_toggler,{attributes:true});
+        tabsbar_fullscr_observer.observe(fullscreen_warning,{attributes:true});
         
         
     }
