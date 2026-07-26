@@ -5,14 +5,16 @@ A switch for Firefox's native sidebar (bookmarks, history, etc). It's a slim ver
 Replace the legacy addon All in One Sidebar. You can open sidebar by clicking edge of screen.
 
 - Left click: toggle sidebar page (bookmark)
+
 - Right click: toggle sidebar launcher / toggle vertical tabs width
+
 - Middle click: toggle vertical tabs
 
 ![screenshot](Screenshot.gif)
 
 This is a Firefox userChrome JS script.
 
-Tested on Firefox 140.
+Tested on Firefox 153.
 
 
 
